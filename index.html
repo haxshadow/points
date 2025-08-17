@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Subdomain Takeover – PoC</title>
+
+  <!-- নিরাপত্তা/এথিক্স -->
+  <meta name="robots" content="noindex, nofollow" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; form-action 'none'">
+
+  <style>
+    :root{
+      --bg:#0f1226; --card:#141834; --accent:#7c4dff; --ok:#00d4a6; --warn:#ff4d67; --text:#e8e8ff; --muted:#a9a9c7;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      background: radial-gradient(1200px 800px at 80% -10%, #1a1f4a 0%, rgba(26,31,74,0) 60%) , var(--bg);
+      color:var(--text); display:flex; align-items:center; justify-content:center; padding:24px;
+    }
+    .wrap{max-width:880px; width:100%}
+    .badge{
+      display:inline-flex; align-items:center; gap:10px; padding:8px 12px; border-radius:999px;
+      background:rgba(255,77,103,.12); color:#ffd8de; border:1px solid rgba(255,77,103,.35);
+      font-weight:600; letter-spacing:.2px;
+    }
+    .card{
+      margin-top:18px; background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:28px;
+      box-shadow:0 10px 30px rgba(0,0,0,.35), inset 0 0 50px rgba(124,77,255,.08);
+      backdrop-filter: blur(6px);
+    }
+    h1{
+      margin:16px 0 8px; font-size:42px; line-height:1.1;
+      background: linear-gradient(90deg, #fff, #c5b8ff, #a98bff); -webkit-background-clip:text; color:transparent;
+    }
+    .sub{color:var(--muted); font-size:15px}
+    .grid{display:grid; grid-template-columns:1.2fr 1fr; gap:22px; margin-top:22px}
+    .panel{background:var(--card); border:1px solid rgba(255,255,255,.06); border-radius:14px; padding:20px}
+    .kvs{display:grid; gap:10px}
+    .kvs div{display:flex; justify-content:space-between; gap:12px; padding:10px 12px; background:rgba(255,255,255,.03); border-radius:10px; border:1px dashed rgba(255,255,255,.08)}
+    code{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size:13px}
+    form{display:grid; gap:12px}
+    label{font-size:13px; color:var(--muted)}
+    input,button,textarea{
+      width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:#0e1230; color:#fff;
+      outline:none;
+    }
+    input:disabled, textarea:disabled{opacity:.7}
+    button{
+      cursor:not-allowed; background:linear-gradient(90deg, var(--accent), #5f7cff); border:0; font-weight:700;
+      letter-spacing:.3px; opacity:.6;
+    }
+    .foot{margin-top:16px; font-size:12px; color:var(--muted)}
+    .sig{
+      margin-top:10px; display:inline-block; padding:8px 12px; border-radius:10px;
+      background:rgba(0,212,166,.12); color:#ccfff2; border:1px solid rgba(0,212,166,.35); font-weight:700;
+    }
+    .note{margin-top:10px; font-size:13px; color:#ffd8de}
+    @media (max-width:860px){ .grid{grid-template-columns:1fr} h1{font-size:34px} }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <span class="badge">⚠️ Critical: Subdomain Takeover (PoC)</span>
+
+    <div class="card">
+      <h1>Takeover By Haxshadow</h1>
+      <p class="sub">
+        এই পেজটা শুধুই <strong>নিরাপত্তা গবেষণা</strong> ও <strong>Responsible Disclosure</strong> এর জন্য। 
+        কোনো ডেটা নেয়া হয় না বা প্রসেস করা হয় না। (Educational PoC)
+      </p>
+
+      <div class="grid">
+        <!-- বাম পাশ: impact / প্রমাণ -->
+        <div class="panel">
+          <h3>📌 কীভাবে প্রমাণিত</h3>
+          <div class="kvs">
+            <div><span>Finding</span><code>Dangling CNAME → GitHub Pages</code></div>
+            <div><span>Host</span><code>github.points.com</code></div>
+            <div><span>Status</span><code>Cloudflare 1014 + GitHub 404</code></div>
+            <div><span>Impact</span><code>Content injection / brand abuse / phishing</code></div>
+          </div>
+          <span class="sig">PoC Verified</span>
+          <p class="note">এই ডেমোতে কোনো ইউজার ডেটা সংগ্রহ করা হয় না। Submit বাটন ইচ্ছাকৃতভাবে নিষ্ক্রিয়।</p>
+        </div>
+
+        <!-- ডান পাশ: নন-ফাংশনাল ফর্ম -->
+        <div class="panel">
+          <h3>🧪 Demo Form (Disabled)</h3>
+          <form onsubmit="return false;">
+            <label>ইমেইল</label>
+            <input type="email" placeholder="name@example.com" disabled>
+            <label>পাসওয়ার্ড</label>
+            <input type="password" placeholder="••••••••" disabled>
+            <label>মেসেজ</label>
+            <textarea rows="3" placeholder="Optional note…" disabled></textarea>
+            <button type="submit" disabled>Submit (Disabled)</button>
+          </form>
+          <div class="foot">* এই ফর্মটি কেবল ভিজ্যুয়াল প্রমাণের জন্য—কোনো রিকোয়েস্ট পাঠানো হয় না।</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot">
+      Responsible Disclosure পরামর্শ: সাইট ওনারদের সঙ্গে যোগাযোগ করে রেকর্ড ঠিক করতে বলুন (CNAME → সঠিক origin / remove).
+    </div>
+  </div>
+</body>
+</html>
